@@ -1,7 +1,7 @@
 #include "character.hpp"
 
 character::character() :
-	position(sf::Vector2f(80, GL)),
+	position(sf::Vector2f(80, GL - 15)),
 	dx(0),
 	dy(0),
 	jumping(0),
@@ -31,7 +31,7 @@ void character::Jump() {
 		}
 	}
 	else {
-		dy -= 14;
+		dy -= 12;
 		jumping = 1;
 	}
 }

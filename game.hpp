@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include "character.hpp"
+#include "obstacle.hpp"
 
 class game
 {
@@ -13,8 +14,8 @@ public:
 	void over();
 	int getScore();
 	int getContam();
-	int getGameSpeed();
-	int getGameState();
+	int getSpeed();
+	int getState();
 	~game();
 private:
 	sf::RenderWindow window;
@@ -22,15 +23,30 @@ private:
 	sf::Font font;
 	sf::ContextSettings settings;
 	sf::Texture textureMario;
+	sf::Texture textureObstacles;
 	sf::Sprite spritePlayerChar;
+	sf::Sprite spriteTallObstacle;
+	sf::Sprite spriteMedObstacle;
+	sf::Sprite spriteWideObstacle;
+
 	sf::Vector2i cursorPos;
 	sf::Text txtCursorPos;
 	std::ostringstream strCursorPos;
 	character playerChar;
+	obstacle tallObstacle1;
+	obstacle tallObstacle2;
+	obstacle medObstacle1;
+	obstacle medObstacle2;
+	obstacle wideObstacle1;
+	obstacle wideObstacle2;
+
+	sf::Clock upsClock;
+	sf::Time accumulator;
+	sf::Time ups;
 
 	int score;
-	float gameSpeed;
+	float speed;
 	float contam;
-	int gameState;	//Ready, Running, Paused, Over
+	int state;	//Ready, Running, Paused, Over
 };
 
