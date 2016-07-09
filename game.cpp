@@ -8,18 +8,16 @@ game::game() :
 	textureMario(),
 	spritePlayerChar(textureMario, sf::IntRect(211, 0, 12, 15)),
 	playerChar(),
-	spriteTallObstacle(textureObstacles, sf::IntRect(5, 4, 53, 125)),
-	spriteMedObstacle(textureObstacles, sf::IntRect(83, 40, 47, 89)),
-	spriteWideObstacle(textureObstacles, sf::IntRect(155, 100, 92, 29)),
-	tallObstacle1(),
-	tallObstacle2(),
-	medObstacle1(),
-	medObstacle2(),
-	wideObstacle1(),
-	wideObstacle2(),
+	spriteTallObstacle1(textureObstacles, sf::IntRect(5, 4, 53, 125)),
+	spriteTallObstacle2(textureObstacles, sf::IntRect(5, 4, 53, 125)),
+	spriteMedObstacle1(textureObstacles, sf::IntRect(83, 40, 47, 89)),
+	spriteMedObstacle2(textureObstacles, sf::IntRect(83, 40, 47, 89)),
+	spriteWideObstacle1(textureObstacles, sf::IntRect(155, 100, 92, 29)),
+	spriteWideObstacle2(textureObstacles, sf::IntRect(155, 100, 92, 29)),
 	cursorPos(),
 	txtCursorPos(),
 	strCursorPos(),
+	lastObstacle(),
 	upsClock(),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f))
@@ -40,19 +38,17 @@ game::game() :
 
 void game::run() {
 	srand(time(NULL));
+	lastObstacle = 0;
+	aObstacles[0].setSize(53, 125);
+	aObstacles[1].setSize(53, 125);
+	aObstacles[2].setSize(47, 89);
+	aObstacles[3].setSize(47, 89);
+	aObstacles[4].setSize(92, 29);
+	aObstacles[5].setSize(92, 29);
+	for (int i = 0; i < 6; i++) {
+		aObstacles[i].Rest();
+	}
 
-	tallObstacle1.setSize(53, 125);
-	tallObstacle2.setSize(53, 125);
-	medObstacle1.setSize(47, 89);
-	medObstacle2.setSize(47, 89);
-	wideObstacle1.setSize(92, 29);
-	wideObstacle2.setSize(92, 29);
-	tallObstacle1.Rest();
-	tallObstacle2.Rest();
-	medObstacle1.Rest();
-	medObstacle2.Rest();
-	wideObstacle1.Rest();
-	wideObstacle2.Rest();
 
 	while (window.isOpen()) {
 		sf::Event event;
@@ -61,6 +57,7 @@ void game::run() {
 				window.close();
 			}
 		}
+
 		while (accumulator > ups) {
 			accumulator -= ups;
 
@@ -70,23 +67,26 @@ void game::run() {
 			playerChar.Move();
 
 			spritePlayerChar.setPosition(playerChar.getPosition());
-			spriteTallObstacle.setPosition(tallObstacle1.getPosition());
-			spriteTallObstacle.setPosition(tallObstacle2.getPosition());
-			spriteMedObstacle.setPosition(medObstacle1.getPosition());
-			spriteMedObstacle.setPosition(medObstacle2.getPosition());
-			spriteWideObstacle.setPosition(wideObstacle1.getPosition());
-			spriteWideObstacle.setPosition(wideObstacle2.getPosition());
+			spriteTallObstacle1.setPosition(aObstacles[0].getPosition());
+			spriteTallObstacle2.setPosition(aObstacles[1].getPosition());
+			spriteMedObstacle1.setPosition(aObstacles[2].getPosition());
+			spriteMedObstacle2.setPosition(aObstacles[3].getPosition());
+			spriteWideObstacle1.setPosition(aObstacles[4].getPosition());
+			spriteWideObstacle2.setPosition(aObstacles[5].getPosition());
 
-			tallObstacle1.Move();
-			tallObstacle2.Move();
-			medObstacle1.Move();
-			medObstacle2.Move();
-			wideObstacle1.Move();
-			wideObstacle2.Move();
+			for (int i = 0; i < 6; i++) {
+				aObstacles[i].Move();
+				if (aObstacles[i].getRestClock().getElapsedTime() > aObstacles[i].getRestTime()) {
+					if (aObstacles[lastObstacle].getPosition().x < 500 || aObstacles[lastObstacle].isResting()) {
+						aObstacles[i].startMoving(8);
+						lastObstacle = i;
+					}
+				}
+			}
 
 			sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
 			std::ostringstream strCursorPos;
-			strCursorPos << "(" << cursorPos.x << ", " << cursorPos.y << ")";
+			strCursorPos << "(" << cursorPos.x << ", " << aObstacles[lastObstacle].getPosition().x << ")";
 			sf::Text txtCursorPos(strCursorPos.str(), font, 17);
 			txtCursorPos.setColor(sf::Color::White);
 		}
@@ -94,9 +94,18 @@ void game::run() {
 		window.clear();
 		window.draw(rectWindow);
 		window.draw(spritePlayerChar);
-		window.draw(spriteTallObstacle);
-		window.draw(spriteMedObstacle);
-		window.draw(spriteWideObstacle);
+		window.draw(spriteTallObstacle1);
+		window.draw(spriteTallObstacle2);
+		window.draw(spriteMedObstacle1);
+		window.draw(spriteMedObstacle2);
+		window.draw(spriteWideObstacle1);
+		window.draw(spriteWideObstacle2);
+
+		sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
+		std::ostringstream strCursorPos;
+		strCursorPos << "(" << cursorPos.x << ", " << aObstacles[lastObstacle].getPosition().x << ")";
+		sf::Text txtCursorPos(strCursorPos.str(), font, 17);
+		txtCursorPos.setColor(sf::Color::White);
 		window.draw(txtCursorPos);
 
 		window.display();
@@ -127,4 +136,5 @@ int game::getState() {
 
 game::~game()
 {
+	delete[] aObstacles;
 }

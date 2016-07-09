@@ -25,25 +25,24 @@ private:
 	sf::Texture textureMario;
 	sf::Texture textureObstacles;
 	sf::Sprite spritePlayerChar;
-	sf::Sprite spriteTallObstacle;
-	sf::Sprite spriteMedObstacle;
-	sf::Sprite spriteWideObstacle;
+	sf::Sprite spriteTallObstacle1;
+	sf::Sprite spriteTallObstacle2;
+	sf::Sprite spriteMedObstacle1;
+	sf::Sprite spriteMedObstacle2;
+	sf::Sprite spriteWideObstacle1;
+	sf::Sprite spriteWideObstacle2;
 
 	sf::Vector2i cursorPos;
 	sf::Text txtCursorPos;
 	std::ostringstream strCursorPos;
 	character playerChar;
-	obstacle tallObstacle1;
-	obstacle tallObstacle2;
-	obstacle medObstacle1;
-	obstacle medObstacle2;
-	obstacle wideObstacle1;
-	obstacle wideObstacle2;
+	obstacle* aObstacles = new obstacle[6];
 
 	sf::Clock upsClock;
 	sf::Time accumulator;
 	sf::Time ups;
 
+	int lastObstacle;
 	int score;
 	float speed;
 	float contam;

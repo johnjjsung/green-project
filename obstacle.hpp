@@ -18,6 +18,9 @@ public:
 	float getdy();
 	int getSelectedSprite();
 	int getType();
+	sf::Time getRestTime();
+	sf::Clock getRestClock();
+	bool isResting();
 	~obstacle();
 private:
 	sf::Vector2f position;
@@ -27,4 +30,5 @@ private:
 	int width, height;
 	sf::Time restTime;
 	sf::Clock restClock;
+	bool resting;
 };

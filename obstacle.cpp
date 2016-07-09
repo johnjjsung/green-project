@@ -36,10 +36,16 @@ void obstacle::Rest() {
 	dx = 0;
 	setRestTimer();
 	restTime = sf::milliseconds((rand() % 10000) + 500);
+	resting = true;
+}
+
+bool obstacle::isResting() {
+	return resting;
 }
 
 void obstacle::startMoving(float speed) {
 	dx = -speed;
+	resting = false;
 }
 
 void obstacle::Move() {
@@ -47,9 +53,9 @@ void obstacle::Move() {
 	if (position.x < -width) {
 		Rest();
 	}
-	if (restClock.getElapsedTime() > restTime) {
-		startMoving(5);
-	}
+	//if (restClock.getElapsedTime() > restTime) {
+	//	startMoving(5);
+	//}
 }
 
 sf::Vector2f obstacle::getPosition() {
@@ -70,6 +76,14 @@ int obstacle::getSelectedSprite() {
 
 int obstacle::getType() {
 	return type;
+}
+
+sf::Time obstacle::getRestTime() {
+	return restTime;
+}
+
+sf::Clock obstacle::getRestClock() {
+	return restClock;
 }
 
 obstacle::~obstacle()
