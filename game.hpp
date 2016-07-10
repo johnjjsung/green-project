@@ -16,6 +16,7 @@ public:
 	int getContam();
 	int getSpeed();
 	int getState();
+	void checkCollision();
 	~game();
 private:
 	sf::RenderWindow window;
@@ -46,6 +47,7 @@ private:
 	int score;
 	float speed;
 	float contam;
+	int disabledObst;
 	int state;	//Ready, Running, Paused, Over
 };
 

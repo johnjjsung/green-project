@@ -14,6 +14,7 @@ public:
 	sf::Vector2f getPosition();
 	float getdx();
 	float getdy();
+	float getHeight();
 	int getSelectedSprite();
 	bool isRunning();
 	bool isJumping();
@@ -21,6 +22,7 @@ public:
 private:
 	sf::Vector2f position;
 	float dx, dy;
+	float height;
 	float jumpPower;
 	int selectedSprite;
 	bool running;

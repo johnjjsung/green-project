@@ -4,6 +4,7 @@ character::character() :
 	position(sf::Vector2f(80, GL - 15)),
 	dx(0),
 	dy(0),
+	height(15),
 	jumping(0),
 	jumpPower(10)
 {
@@ -43,7 +44,7 @@ void character::Land() {
 }
 
 void character::MoveIn() {
-
+	
 }
 
 sf::Vector2f character::getPosition() {
@@ -56,6 +57,10 @@ float character::getdx() {
 
 float character::getdy() {
 	return dy;
+}
+
+float character::getHeight() {
+	return height;
 }
 
 int character::getSelectedSprite() {

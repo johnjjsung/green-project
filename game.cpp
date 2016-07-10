@@ -19,6 +19,8 @@ game::game() :
 	strCursorPos(),
 	lastObstacle(),
 	upsClock(),
+	contam(0),
+	disabledObst(42),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f))
 {
@@ -65,6 +67,7 @@ void game::run() {
 				playerChar.Jump();
 			}
 			playerChar.Move();
+			checkCollision();
 
 			spritePlayerChar.setPosition(playerChar.getPosition());
 			spriteTallObstacle1.setPosition(aObstacles[0].getPosition());
@@ -103,7 +106,7 @@ void game::run() {
 
 		sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
 		std::ostringstream strCursorPos;
-		strCursorPos << "(" << cursorPos.x << ", " << aObstacles[lastObstacle].getPosition().x << ")";
+		strCursorPos << "(" << contam << ", " << aObstacles[lastObstacle].getPosition().x << ")";
 		sf::Text txtCursorPos(strCursorPos.str(), font, 17);
 		txtCursorPos.setColor(sf::Color::White);
 		window.draw(txtCursorPos);
@@ -111,6 +114,20 @@ void game::run() {
 		window.display();
 
 		accumulator += upsClock.restart();
+	}
+}
+
+void game::checkCollision() {
+	for (int i = 0; i < 6; i++) {
+		if (i != disabledObst) {
+			if (playerChar.getPosition().x > aObstacles[i].getPosition().x && playerChar.getPosition().x < aObstacles[i].getPosition().x + aObstacles[i].getWidth()) {
+				if (playerChar.getPosition().y + playerChar.getHeight() > aObstacles[i].getPosition().y) {
+					playerChar.MoveIn();
+					contam++;
+					disabledObst = i;
+				}
+			}
+		}
 	}
 }
 
