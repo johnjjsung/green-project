@@ -8,6 +8,7 @@ obstacle::obstacle():
 	position(sf::Vector2f(WindowWidth + width, GL - height)),
 	restClock(),
 	restTime(),
+	restTimeBase(8000),
 	dx(0),
 	dy(0)
 {
@@ -31,11 +32,15 @@ void obstacle::setRestTimer() {
 	restClock.restart();
 }
  
+void obstacle::setRestTimeBase(int newRestTimeBase) {
+	restTimeBase = newRestTimeBase;
+}
+
 void obstacle::Rest() {
 	position.x = WindowWidth + width;
 	dx = 0;
 	setRestTimer();
-	restTime = sf::milliseconds((rand() % 10000) + 500);
+	restTime = sf::milliseconds((rand() % restTimeBase) + 500);
 	resting = true;
 }
 

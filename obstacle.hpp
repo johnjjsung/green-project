@@ -20,6 +20,7 @@ public:
 	int getType();
 	sf::Time getRestTime();
 	sf::Clock getRestClock();
+	void setRestTimeBase(int newRestTimeBase);
 	bool isResting();
 	~obstacle();
 private:
@@ -31,4 +32,5 @@ private:
 	sf::Time restTime;
 	sf::Clock restClock;
 	bool resting;
+	int restTimeBase;
 };

@@ -4,6 +4,7 @@ character::character() :
 	position(sf::Vector2f(80, GL - 15)),
 	dx(0),
 	dy(0),
+	width(12),
 	height(15),
 	jumping(0),
 	jumpPower(10)
@@ -57,6 +58,10 @@ float character::getdx() {
 
 float character::getdy() {
 	return dy;
+}
+
+float character::getWidth() {
+	return width;
 }
 
 float character::getHeight() {

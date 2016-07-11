@@ -45,9 +45,11 @@ private:
 
 	int lastObstacle;
 	int score;
+	int scoreCountdown;
 	float speed;
 	float contam;
 	int disabledObst;
 	int state;	//Ready, Running, Paused, Over
+	bool firstObstStarted;
 };
 

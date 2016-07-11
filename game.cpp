@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include <math.h>
 
 game::game() :
 	settings(),
@@ -18,11 +19,15 @@ game::game() :
 	txtCursorPos(),
 	strCursorPos(),
 	lastObstacle(),
-	upsClock(),
 	contam(0),
 	disabledObst(42),
+	score(0),
+	speed(5),
+	scoreCountdown(10),
+	upsClock(),
 	accumulator(sf::Time::Zero),
-	ups(sf::seconds(1.f / 60.f))
+	ups(sf::seconds(1.f / 60.f)),
+	firstObstStarted(false)
 {
 	settings.antialiasingLevel = 4;
 	window.setVerticalSyncEnabled(true);
@@ -51,7 +56,6 @@ void game::run() {
 		aObstacles[i].Rest();
 	}
 
-
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -62,6 +66,8 @@ void game::run() {
 
 		while (accumulator > ups) {
 			accumulator -= ups;
+
+			speed = 5 + log(score + 10);
 
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
 				playerChar.Jump();
@@ -77,21 +83,40 @@ void game::run() {
 			spriteWideObstacle1.setPosition(aObstacles[4].getPosition());
 			spriteWideObstacle2.setPosition(aObstacles[5].getPosition());
 
+			int countResting = 0;
 			for (int i = 0; i < 6; i++) {
+
 				aObstacles[i].Move();
+				aObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
 				if (aObstacles[i].getRestClock().getElapsedTime() > aObstacles[i].getRestTime()) {
-					if (aObstacles[lastObstacle].getPosition().x < 500 || aObstacles[lastObstacle].isResting()) {
-						aObstacles[i].startMoving(8);
+					if (aObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || aObstacles[lastObstacle].isResting()) {
+						if ((lastObstacle == 1 || 2) && (i == 1 || 2)) {
+							if (aObstacles[lastObstacle].getPosition().x < 500 - (speed * 7) || aObstacles[lastObstacle].isResting()) {
+								aObstacles[i].startMoving(speed);
+								lastObstacle = i;
+								firstObstStarted = true;
+							}
+						}
+						aObstacles[i].startMoving(speed);
 						lastObstacle = i;
+						firstObstStarted = true;
 					}
 				}
+				if (aObstacles[i].isResting()) {
+					countResting++;
+				}
+				/*if (countResting == 6 && !firstObstStarted) {
+					int randInt = rand() % 6;
+					aObstacles[randInt].startMoving(speed);
+					lastObstacle = randInt;
+				}*/
 			}
 
-			sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
-			std::ostringstream strCursorPos;
-			strCursorPos << "(" << cursorPos.x << ", " << aObstacles[lastObstacle].getPosition().x << ")";
-			sf::Text txtCursorPos(strCursorPos.str(), font, 17);
-			txtCursorPos.setColor(sf::Color::White);
+			scoreCountdown--;
+			if (scoreCountdown == 0) {
+				score++;
+				scoreCountdown = 10;
+			}
 		}
 
 		window.clear();
@@ -106,7 +131,7 @@ void game::run() {
 
 		sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
 		std::ostringstream strCursorPos;
-		strCursorPos << "(" << contam << ", " << aObstacles[lastObstacle].getPosition().x << ")";
+		strCursorPos << "(" << contam << ", " << score << ")";
 		sf::Text txtCursorPos(strCursorPos.str(), font, 17);
 		txtCursorPos.setColor(sf::Color::White);
 		window.draw(txtCursorPos);
@@ -120,7 +145,7 @@ void game::run() {
 void game::checkCollision() {
 	for (int i = 0; i < 6; i++) {
 		if (i != disabledObst) {
-			if (playerChar.getPosition().x > aObstacles[i].getPosition().x && playerChar.getPosition().x < aObstacles[i].getPosition().x + aObstacles[i].getWidth()) {
+			if (playerChar.getPosition().x + playerChar.getWidth() > aObstacles[i].getPosition().x && playerChar.getPosition().x < aObstacles[i].getPosition().x + aObstacles[i].getWidth()) {
 				if (playerChar.getPosition().y + playerChar.getHeight() > aObstacles[i].getPosition().y) {
 					playerChar.MoveIn();
 					contam++;
