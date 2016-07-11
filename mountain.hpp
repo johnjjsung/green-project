@@ -1,26 +1,23 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "header.hpp"
+#include "Header.hpp"
 
-class obstacle
+class mountain
 {
 public:
-	obstacle();
+	mountain();
 	void setRestTimer();
 	void Rest();
+	sf::Time getRestTime();
+	sf::Clock getRestClock();
+	bool isResting();
 	void startMoving(float speed);
 	void Move();
+	sf::Vector2f getPosition();
 	void setSize(int newWidth, int newHeight);
 	int getWidth();
 	int getHeight();
-	sf::Vector2f getPosition();
-	float getdx();
-	float getdy();
-	sf::Time getRestTime();
-	sf::Clock getRestClock();
-	void setRestTimeBase(int newRestTimeBase);
-	bool isResting();
-	~obstacle();
+	~mountain();
 private:
 	sf::Vector2f position;
 	float dx, dy;
@@ -28,5 +25,5 @@ private:
 	sf::Time restTime;
 	sf::Clock restClock;
 	bool resting;
-	int restTimeBase;
 };
+

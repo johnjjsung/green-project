@@ -1,8 +1,6 @@
 #include "obstacle.hpp"
 
 obstacle::obstacle():
-	type(),
-	selectedSprite(),
 	width(),
 	height(),
 	position(sf::Vector2f(WindowWidth + width, GL - height)),
@@ -17,7 +15,7 @@ obstacle::obstacle():
 void obstacle::setSize(int newWidth, int newHeight) {
 	width = newWidth;
 	height = newHeight;
-	position = sf::Vector2f(WindowWidth + width, GL - height + 15);
+	position = sf::Vector2f(WindowWidth + width, GL - height);
 }
 
 int obstacle::getWidth() {
@@ -73,14 +71,6 @@ float obstacle::getdx() {
 
 float obstacle::getdy() {
 	return dy;
-}
-
-int obstacle::getSelectedSprite() {
-	return selectedSprite;
-}
-
-int obstacle::getType() {
-	return type;
 }
 
 sf::Time obstacle::getRestTime() {

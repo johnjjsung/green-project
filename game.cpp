@@ -3,10 +3,10 @@
 
 game::game() :
 	settings(),
-	window(sf::VideoMode(WindowWidth, WindowHeight), "SFML", sf::Style::Close, settings),
-	rectWindow(sf::Vector2f(WindowWidth, WindowHeight)),
+	window(sf::VideoMode(WindowWidth, WindowHeight), "Green Project", sf::Style::Close, settings),
+	rectSky(sf::Vector2f(WindowWidth, GL)),
+	rectGround(sf::Vector2f(WindowWidth, WindowHeight - GL)),
 	font(),
-	textureMario(),
 	spritePlayerChar(textureMario, sf::IntRect(211, 0, 12, 15)),
 	playerChar(),
 	spriteTallObstacle1(textureObstacles, sf::IntRect(5, 4, 53, 125)),
@@ -15,9 +15,24 @@ game::game() :
 	spriteMedObstacle2(textureObstacles, sf::IntRect(83, 40, 47, 89)),
 	spriteWideObstacle1(textureObstacles, sf::IntRect(155, 100, 92, 29)),
 	spriteWideObstacle2(textureObstacles, sf::IntRect(155, 100, 92, 29)),
-	cursorPos(),
-	txtCursorPos(),
-	strCursorPos(),
+
+	spriteMountain1(textureMountains, sf::IntRect(0, 0, 202, 87)),
+	spriteMountain2(textureMountains, sf::IntRect(222, 0, 307, 87)),
+	spriteMountain3(textureMountains, sf::IntRect(10, 171, 155, 55)),
+	spriteMountain4(textureMountains, sf::IntRect(205, 190, 220, 36)),
+
+	spriteMountain1_contam1(textureMountains, sf::IntRect(0, 321, 202, 83)),
+	spriteMountain2_contam1(textureMountains, sf::IntRect(222, 359, 308, 45)),
+	spriteMountain3_contam1(textureMountains, sf::IntRect(10, 488, 155, 55)),
+	spriteMountain4_contam1(textureMountains, sf::IntRect(205, 508, 220, 35)),
+
+	spriteMountain1_contam2(textureMountains, sf::IntRect(0, 647, 202, 83)),
+	spriteMountain2_contam2(textureMountains, sf::IntRect(222, 666, 308, 64)),
+	spriteMountain3_contam2(textureMountains, sf::IntRect(10, 814, 155, 59)),
+	spriteMountain4_contam2(textureMountains, sf::IntRect(205, 823, 220, 46)),
+
+	txtScore(),
+	strScore(),
 	lastObstacle(),
 	contam(0),
 	disabledObst(42),
@@ -27,11 +42,14 @@ game::game() :
 	upsClock(),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f)),
-	firstObstStarted(false)
+	state(0)
 {
 	settings.antialiasingLevel = 4;
 	window.setVerticalSyncEnabled(true);
-	rectWindow.setFillColor(sf::Color(120, 170, 255));
+	rectSky.setFillColor(sf::Color(120, 170, 255));
+	rectGround.setPosition(sf::Vector2f(0, GL));
+	rectGround.setFillColor(sf::Color(134, 89, 45));
+
 	if (!font.loadFromFile("ACaslonPro-Regular.otf")) {
 		// error
 	}
@@ -41,20 +59,42 @@ game::game() :
 	if (!textureObstacles.loadFromFile("obstacles.png")) {
 		// error
 	}
+	if (!textureMountains.loadFromFile("mountains.png")) {
+		// error
+	}
 }
 
 void game::run() {
+
 	srand(time(NULL));
 	lastObstacle = 0;
-	aObstacles[0].setSize(53, 125);
-	aObstacles[1].setSize(53, 125);
-	aObstacles[2].setSize(47, 89);
-	aObstacles[3].setSize(47, 89);
-	aObstacles[4].setSize(92, 29);
-	aObstacles[5].setSize(92, 29);
+	arObstacles[0].setSize(53, 125);
+	arObstacles[1].setSize(53, 125);
+	arObstacles[2].setSize(47, 89);
+	arObstacles[3].setSize(47, 89);
+	arObstacles[4].setSize(92, 29);
+	arObstacles[5].setSize(92, 29);
 	for (int i = 0; i < 6; i++) {
-		aObstacles[i].Rest();
+		arObstacles[i].Rest();
 	}
+
+	arMountains[0].setSize(202, 87);
+	arMountains[1].setSize(307, 87);
+	arMountains[2].setSize(155, 55);
+	arMountains[3].setSize(220, 36);
+	arMountains[4].setSize(202, 83);
+	arMountains[5].setSize(308, 45);
+	arMountains[6].setSize(155, 55);
+	arMountains[7].setSize(220, 35);
+	arMountains[8].setSize(202, 83);
+	arMountains[9].setSize(308, 64);
+	arMountains[10].setSize(155, 59);
+	arMountains[11].setSize(220, 46);
+	for (int i = 0; i < 4; i++) {
+		arMountains[i].Rest();
+	}
+
+	state = 1;	//Running
 
 	while (window.isOpen()) {
 		sf::Event event;
@@ -67,74 +107,107 @@ void game::run() {
 		while (accumulator > ups) {
 			accumulator -= ups;
 
-			speed = 5 + log(score + 10);
+			if (state == 1) {
+				speed = 5 + log(score + 10);
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-				playerChar.Jump();
-			}
-			playerChar.Move();
-			checkCollision();
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+					playerChar.Jump();
+				}
+				playerChar.Move();
+				checkCollision();
+				if (contam >= 3) {
+					over();
+				}
 
-			spritePlayerChar.setPosition(playerChar.getPosition());
-			spriteTallObstacle1.setPosition(aObstacles[0].getPosition());
-			spriteTallObstacle2.setPosition(aObstacles[1].getPosition());
-			spriteMedObstacle1.setPosition(aObstacles[2].getPosition());
-			spriteMedObstacle2.setPosition(aObstacles[3].getPosition());
-			spriteWideObstacle1.setPosition(aObstacles[4].getPosition());
-			spriteWideObstacle2.setPosition(aObstacles[5].getPosition());
+				spritePlayerChar.setPosition(playerChar.getPosition());
+				spriteTallObstacle1.setPosition(arObstacles[0].getPosition());
+				spriteTallObstacle2.setPosition(arObstacles[1].getPosition());
+				spriteMedObstacle1.setPosition(arObstacles[2].getPosition());
+				spriteMedObstacle2.setPosition(arObstacles[3].getPosition());
+				spriteWideObstacle1.setPosition(arObstacles[4].getPosition());
+				spriteWideObstacle2.setPosition(arObstacles[5].getPosition());
 
-			int countResting = 0;
-			for (int i = 0; i < 6; i++) {
+				spriteMountain1.setPosition(arMountains[0].getPosition());
+				spriteMountain2.setPosition(arMountains[1].getPosition());
+				spriteMountain3.setPosition(arMountains[2].getPosition());
+				spriteMountain4.setPosition(arMountains[3].getPosition());
+				spriteMountain1_contam1.setPosition(arMountains[4].getPosition());
+				spriteMountain2_contam1.setPosition(arMountains[5].getPosition());
+				spriteMountain3_contam1.setPosition(arMountains[6].getPosition());
+				spriteMountain4_contam1.setPosition(arMountains[7].getPosition());
+				spriteMountain1_contam2.setPosition(arMountains[8].getPosition());
+				spriteMountain2_contam2.setPosition(arMountains[9].getPosition());
+				spriteMountain3_contam2.setPosition(arMountains[10].getPosition());
+				spriteMountain4_contam2.setPosition(arMountains[11].getPosition());
 
-				aObstacles[i].Move();
-				aObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
-				if (aObstacles[i].getRestClock().getElapsedTime() > aObstacles[i].getRestTime()) {
-					if (aObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || aObstacles[lastObstacle].isResting()) {
-						if ((lastObstacle == 1 || 2) && (i == 1 || 2)) {
-							if (aObstacles[lastObstacle].getPosition().x < 500 - (speed * 7) || aObstacles[lastObstacle].isResting()) {
-								aObstacles[i].startMoving(speed);
-								lastObstacle = i;
-								firstObstStarted = true;
+
+				for (int i = 0; i < 6; i++) {
+					arObstacles[i].Move();
+					arObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
+					if (arObstacles[i].getRestClock().getElapsedTime() > arObstacles[i].getRestTime()) {
+						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || arObstacles[lastObstacle].isResting()) {
+							if ((lastObstacle == 1 || 2) && (i == 1 || 2)) {
+								if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 7) || arObstacles[lastObstacle].isResting()) {
+									arObstacles[i].startMoving(speed);
+									lastObstacle = i;
+								}
 							}
+							arObstacles[i].startMoving(speed);
+							lastObstacle = i;
 						}
-						aObstacles[i].startMoving(speed);
-						lastObstacle = i;
-						firstObstStarted = true;
 					}
 				}
-				if (aObstacles[i].isResting()) {
-					countResting++;
-				}
-				/*if (countResting == 6 && !firstObstStarted) {
-					int randInt = rand() % 6;
-					aObstacles[randInt].startMoving(speed);
-					lastObstacle = randInt;
-				}*/
-			}
 
-			scoreCountdown--;
-			if (scoreCountdown == 0) {
-				score++;
-				scoreCountdown = 10;
+				for (int i = 0; i < 12; i++) {
+					arMountains[i].Move();
+				}
+
+				if (contam < 3) {
+					for (int i = contam * 4; i < (contam * 4) + 4; i++) {
+						if (arMountains[i].getRestClock().getElapsedTime() > arMountains[i].getRestTime()) {
+							arMountains[i].startMoving(speed / 10);
+						}
+					}
+				}
+
+				scoreCountdown--;
+				if (scoreCountdown == 0) {
+					score++;
+					scoreCountdown = 10;
+				}
 			}
 		}
 
 		window.clear();
-		window.draw(rectWindow);
-		window.draw(spritePlayerChar);
+		window.draw(rectSky);
+		window.draw(rectGround);
+		window.draw(spriteMountain1);
+		window.draw(spriteMountain2);
+		window.draw(spriteMountain3);
+		window.draw(spriteMountain4);
+		window.draw(spriteMountain1_contam1);
+		window.draw(spriteMountain2_contam1);
+		window.draw(spriteMountain3_contam1);
+		window.draw(spriteMountain4_contam1);
+		window.draw(spriteMountain1_contam2);
+		window.draw(spriteMountain2_contam2);
+		window.draw(spriteMountain3_contam2);
+		window.draw(spriteMountain4_contam2);
 		window.draw(spriteTallObstacle1);
 		window.draw(spriteTallObstacle2);
 		window.draw(spriteMedObstacle1);
 		window.draw(spriteMedObstacle2);
 		window.draw(spriteWideObstacle1);
 		window.draw(spriteWideObstacle2);
+		window.draw(spritePlayerChar);
 
-		sf::Vector2i cursorPos = sf::Mouse::getPosition(window);
-		std::ostringstream strCursorPos;
-		strCursorPos << "(" << contam << ", " << score << ")";
-		sf::Text txtCursorPos(strCursorPos.str(), font, 17);
-		txtCursorPos.setColor(sf::Color::White);
-		window.draw(txtCursorPos);
+		std::ostringstream strScore;
+		//strCursorPos << "(" << contam << ", " << score << ")";
+		strScore << score;
+		sf::Text txtScore(strScore.str(), font, 22);
+		txtScore.setColor(sf::Color::White);
+		txtScore.setPosition(sf::Vector2f(WindowWidth - 60, 5));
+		window.draw(txtScore);
 
 		window.display();
 
@@ -145,11 +218,17 @@ void game::run() {
 void game::checkCollision() {
 	for (int i = 0; i < 6; i++) {
 		if (i != disabledObst) {
-			if (playerChar.getPosition().x + playerChar.getWidth() > aObstacles[i].getPosition().x && playerChar.getPosition().x < aObstacles[i].getPosition().x + aObstacles[i].getWidth()) {
-				if (playerChar.getPosition().y + playerChar.getHeight() > aObstacles[i].getPosition().y) {
+			if (playerChar.getPosition().x + playerChar.getWidth() > arObstacles[i].getPosition().x && playerChar.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
+				if (playerChar.getPosition().y + playerChar.getHeight() > arObstacles[i].getPosition().y) {
 					playerChar.MoveIn();
 					contam++;
 					disabledObst = i;
+
+					if (contam < 3) {
+						for (int j = contam * 4; j < (contam * 4) + 4; j++) {
+							arMountains[j].Rest();
+						}
+					}
 				}
 			}
 		}
@@ -157,7 +236,7 @@ void game::checkCollision() {
 }
 
 void game::over() {
-
+	state = 0;
 }
 
 int game::getScore() {
@@ -178,5 +257,6 @@ int game::getState() {
 
 game::~game()
 {
-	delete[] aObstacles;
+	delete[] arObstacles;
+	delete[] arMountains;
 }

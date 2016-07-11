@@ -5,6 +5,7 @@
 #include <string>
 #include "character.hpp"
 #include "obstacle.hpp"
+#include "mountain.hpp"
 
 class game
 {
@@ -20,12 +21,16 @@ public:
 	~game();
 private:
 	sf::RenderWindow window;
-	sf::RectangleShape rectWindow;
+	sf::RectangleShape rectSky;
+	sf::RectangleShape rectGround;
 	sf::Font font;
 	sf::ContextSettings settings;
 	sf::Texture textureMario;
 	sf::Texture textureObstacles;
+	sf::Texture textureMountains;
+
 	sf::Sprite spritePlayerChar;
+
 	sf::Sprite spriteTallObstacle1;
 	sf::Sprite spriteTallObstacle2;
 	sf::Sprite spriteMedObstacle1;
@@ -33,11 +38,24 @@ private:
 	sf::Sprite spriteWideObstacle1;
 	sf::Sprite spriteWideObstacle2;
 
-	sf::Vector2i cursorPos;
-	sf::Text txtCursorPos;
-	std::ostringstream strCursorPos;
+	sf::Sprite spriteMountain1;
+	sf::Sprite spriteMountain2;
+	sf::Sprite spriteMountain3;
+	sf::Sprite spriteMountain4;
+	sf::Sprite spriteMountain1_contam1;
+	sf::Sprite spriteMountain2_contam1;
+	sf::Sprite spriteMountain3_contam1;
+	sf::Sprite spriteMountain4_contam1;
+	sf::Sprite spriteMountain1_contam2;
+	sf::Sprite spriteMountain2_contam2;
+	sf::Sprite spriteMountain3_contam2;
+	sf::Sprite spriteMountain4_contam2;
+
+	sf::Text txtScore;
+	std::ostringstream strScore;
 	character playerChar;
-	obstacle* aObstacles = new obstacle[6];
+	obstacle* arObstacles = new obstacle[6];
+	mountain* arMountains = new mountain[12];
 
 	sf::Clock upsClock;
 	sf::Time accumulator;
@@ -49,7 +67,7 @@ private:
 	float speed;
 	float contam;
 	int disabledObst;
-	int state;	//Ready, Running, Paused, Over
-	bool firstObstStarted;
+	int state;	//Ready, Running, Over
+	int countMountainTexture;
 };
 

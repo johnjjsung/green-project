@@ -1,7 +1,7 @@
 #include "character.hpp"
 
 character::character() :
-	position(sf::Vector2f(80, GL - 15)),
+	position(sf::Vector2f(80, GL - height)),
 	dx(0),
 	dy(0),
 	width(12),
@@ -13,11 +13,11 @@ character::character() :
 
 void character::Move() {
 	position = sf::Vector2f(position.x + dx, position.y + dy);
-	if (position.y + (dy + G) < GL) {
+	if (position.y + (dy + G) < GL - height) {
 		dy += G;
 	}
 	else {
-		position.y = GL;
+		position.y = GL - height;
 		dy = 0;
 		Land();
 	}
