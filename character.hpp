@@ -12,6 +12,7 @@ public:
 	void Land();
 	sf::Vector2f getPosition();
 	void setPosition(int newx, int newy);
+	void setdy(float newdy);
 	float getdx();
 	float getdy();
 	void setSize(int newWidth, int newHeight);

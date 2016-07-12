@@ -16,6 +16,10 @@ public:
 	void over();
 	void checkCollision();
 	void renderPlayerChar();
+	void changeChar();
+	void setSpritePosition();
+	void renderMountains();
+	void renderObstacles();
 	~game();
 private:
 	sf::RenderWindow window;
@@ -23,7 +27,7 @@ private:
 	sf::RectangleShape rectGround;
 	sf::Font font;
 	sf::ContextSettings settings;
-	sf::Texture textuerPlayerChar;
+	sf::Texture texturePlayerChar;
 	sf::Texture textureObstacles;
 	sf::Texture textureMountains;
 
@@ -31,6 +35,16 @@ private:
 	sf::Sprite spriteMarioWalk2;
 	sf::Sprite spriteMarioWalk3;
 	sf::Sprite spriteMarioJump;
+
+	sf::Sprite spriteQuoteWalk1;
+	sf::Sprite spriteQuoteWalk2;
+	sf::Sprite spriteQuoteWalk3;
+	sf::Sprite spriteQuoteJump1;
+	sf::Sprite spriteQuoteJump2;
+
+	sf::Sprite spriteDinoWalk1;
+	sf::Sprite spriteDinoWalk2;
+	sf::Sprite spriteDinoJump;
 
 	sf::Sprite spriteTallObstacle1;
 	sf::Sprite spriteTallObstacle2;
@@ -56,6 +70,17 @@ private:
 	character marioWalk2;
 	character marioWalk3;
 	character marioJump;
+
+	character quoteWalk1;
+	character quoteWalk2;
+	character quoteWalk3;
+	character quoteJump1;
+	character quoteJump2;
+	
+	character dinoWalk1;
+	character dinoWalk2;
+	character dinoJump;
+
 	obstacle* arObstacles = new obstacle[6];
 	mountain* arMountains = new mountain[12];
 
@@ -69,10 +94,11 @@ private:
 	int highScore;
 	int playerSpriteCountdown;
 	float speed;
-	float contam;
+	int contam;
 	int disabledObst;
 	int state;	//Ready, Running, Over
 	int countMountainTexture;
 	int restartCountdown;
+	bool firstCycleRan;
 };
 

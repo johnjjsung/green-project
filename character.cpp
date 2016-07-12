@@ -52,6 +52,10 @@ void character::setPosition(int newx, int newy) {
 	position = sf::Vector2f(newx, newy);
 }
 
+void character::setdy(float newdy) {
+	dy = newdy;
+}
+
 float character::getdx() {
 	return dx;
 }
@@ -63,7 +67,6 @@ float character::getdy() {
 void character::setSize(int newWidth, int newHeight) {
 	width = newWidth;
 	height = newHeight;
-	position = sf::Vector2f(80, GL - height);
 }
 
 float character::getWidth() {

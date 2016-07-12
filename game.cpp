@@ -7,10 +7,20 @@ game::game() :
 	rectSky(sf::Vector2f(WindowWidth, GL)),
 	rectGround(sf::Vector2f(WindowWidth, WindowHeight - GL)),
 	font(),
-	spriteMarioWalk1(textuerPlayerChar, sf::IntRect(2, 2, 29, 30)),
-	spriteMarioWalk2(textuerPlayerChar, sf::IntRect(39, 5, 25, 33)),
-	spriteMarioWalk3(textuerPlayerChar, sf::IntRect(71, 5, 33, 33)),
-	spriteMarioJump(textuerPlayerChar, sf::IntRect(114, 5, 36, 33)),
+	spriteMarioWalk1(texturePlayerChar, sf::IntRect(2, 2, 29, 30)),
+	spriteMarioWalk2(texturePlayerChar, sf::IntRect(39, 5, 25, 33)),
+	spriteMarioWalk3(texturePlayerChar, sf::IntRect(71, 5, 33, 33)),
+	spriteMarioJump(texturePlayerChar, sf::IntRect(114, 5, 36, 33)),
+
+	spriteQuoteWalk1(texturePlayerChar, sf::IntRect(3, 52, 27, 30)),
+	spriteQuoteWalk2(texturePlayerChar, sf::IntRect(36, 53, 27, 29)),
+	spriteQuoteWalk3(texturePlayerChar, sf::IntRect(70, 52, 27, 30)),
+	spriteQuoteJump1(texturePlayerChar, sf::IntRect(70, 52, 27, 30)),
+	spriteQuoteJump2(texturePlayerChar, sf::IntRect(3, 52, 27, 30)),
+
+	spriteDinoWalk1(texturePlayerChar, sf::IntRect(6, 98, 39, 42)),
+	spriteDinoWalk2(texturePlayerChar, sf::IntRect(58, 98, 39, 42)),
+	spriteDinoJump(texturePlayerChar, sf::IntRect(108, 99, 39, 42)),
 
 	spriteTallObstacle1(textureObstacles, sf::IntRect(5, 4, 53, 125)),
 	spriteTallObstacle2(textureObstacles, sf::IntRect(5, 4, 53, 125)),
@@ -34,7 +44,7 @@ game::game() :
 	spriteMountain3_contam2(textureMountains, sf::IntRect(10, 814, 155, 55)),
 	spriteMountain4_contam2(textureMountains, sf::IntRect(205, 823, 220, 46)),
 
-	playerSpriteCountdown(10),
+	playerSpriteCountdown(18),
 	upsClock(),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f)),
@@ -50,7 +60,7 @@ game::game() :
 	if (!font.loadFromFile("pixelmix_bold.ttf")) {
 		// error
 	}
-	if (!textuerPlayerChar.loadFromFile("sprites/player.png")) {
+	if (!texturePlayerChar.loadFromFile("sprites/player.png")) {
 		// error
 	}
 	if (!textureObstacles.loadFromFile("sprites/obstacles.png")) {
@@ -64,6 +74,8 @@ game::game() :
 void game::run() {
 	srand(time(NULL));
 
+	firstCycleRan = false;
+
 	speed = 5;
 	score = 0;
 	contam = 0;
@@ -71,7 +83,6 @@ void game::run() {
 	restartCountdown = 100;
 	disabledObst = 42;
 	lastObstacle = 0;
-	state = 1;	//Running
 
 	arObstacles[0].setSize(53, 125);
 	arObstacles[1].setSize(53, 125);
@@ -111,15 +122,35 @@ void game::run() {
 			accumulator -= ups;
 
 			if (state == 1) {
-				speed = 6 + score/120;
+					speed = 6 + score / 100;
 
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
 					marioWalk1.Jump();
+					quoteWalk1.Jump();
+					dinoWalk1.Jump();
 				}
-				marioWalk1.Move();
-				marioWalk2.setPosition(marioWalk1.getPosition().x+4, marioWalk1.getPosition().y-3);
-				marioWalk3.setPosition(marioWalk1.getPosition().x-3, marioWalk1.getPosition().y-3);
-				marioJump.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+
+				switch (contam) {
+				case 0:
+					marioWalk1.Move();
+					marioWalk2.setPosition(marioWalk1.getPosition().x + 4, marioWalk1.getPosition().y - 3);
+					marioWalk3.setPosition(marioWalk1.getPosition().x - 3, marioWalk1.getPosition().y - 3);
+					marioJump.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+					break;
+				case 1:
+					quoteWalk1.Move();
+					quoteWalk2.setPosition(quoteWalk1.getPosition().x, quoteWalk1.getPosition().y);
+					quoteWalk3.setPosition(quoteWalk1.getPosition().x, quoteWalk1.getPosition().y + 1);
+					quoteJump1.setPosition(quoteWalk1.getPosition().x, quoteWalk1.getPosition().y);
+					quoteJump2.setPosition(quoteWalk1.getPosition().x, quoteWalk1.getPosition().y);
+					break;
+				case 2:
+					dinoWalk1.Move();
+					dinoWalk2.setPosition(dinoWalk1.getPosition().x, dinoWalk1.getPosition().y);
+					dinoJump.setPosition(dinoWalk1.getPosition().x, dinoWalk1.getPosition().y);
+					break;
+				}
+
 				checkCollision();
 				if (contam >= 3) {
 					over();
@@ -130,26 +161,17 @@ void game::run() {
 				spriteMarioWalk3.setPosition(marioWalk3.getPosition());
 				spriteMarioJump.setPosition(marioJump.getPosition());
 
-				spriteTallObstacle1.setPosition(arObstacles[0].getPosition());
-				spriteTallObstacle2.setPosition(arObstacles[1].getPosition());
-				spriteMedObstacle1.setPosition(arObstacles[2].getPosition());
-				spriteMedObstacle2.setPosition(arObstacles[3].getPosition());
-				spriteWideObstacle1.setPosition(arObstacles[4].getPosition());
-				spriteWideObstacle2.setPosition(arObstacles[5].getPosition());
+				spriteQuoteWalk1.setPosition(quoteWalk1.getPosition());
+				spriteQuoteWalk2.setPosition(quoteWalk2.getPosition());
+				spriteQuoteWalk3.setPosition(quoteWalk3.getPosition());
+				spriteQuoteJump1.setPosition(quoteJump1.getPosition());
+				spriteQuoteJump2.setPosition(quoteJump2.getPosition());
 
-				spriteMountain1.setPosition(arMountains[0].getPosition());
-				spriteMountain2.setPosition(arMountains[1].getPosition());
-				spriteMountain3.setPosition(arMountains[2].getPosition());
-				spriteMountain4.setPosition(arMountains[3].getPosition());
-				spriteMountain1_contam1.setPosition(arMountains[4].getPosition());
-				spriteMountain2_contam1.setPosition(arMountains[5].getPosition());
-				spriteMountain3_contam1.setPosition(arMountains[6].getPosition());
-				spriteMountain4_contam1.setPosition(arMountains[7].getPosition());
-				spriteMountain1_contam2.setPosition(arMountains[8].getPosition());
-				spriteMountain2_contam2.setPosition(arMountains[9].getPosition());
-				spriteMountain3_contam2.setPosition(arMountains[10].getPosition());
-				spriteMountain4_contam2.setPosition(arMountains[11].getPosition());
+				spriteDinoWalk1.setPosition(dinoWalk1.getPosition());
+				spriteDinoWalk2.setPosition(dinoWalk2.getPosition());
+				spriteDinoJump.setPosition(dinoJump.getPosition());
 
+				setSpritePosition();
 
 				for (int i = 0; i < 6; i++) {
 					arObstacles[i].Move();
@@ -157,7 +179,7 @@ void game::run() {
 					if (arObstacles[i].getRestClock().getElapsedTime() > arObstacles[i].getRestTime()) {
 						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 6) || arObstacles[lastObstacle].isResting()) {
 							if ((lastObstacle == 1 || 2) && (i == 1 || 2)) {
-								if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 9) || arObstacles[lastObstacle].isResting()) {
+								if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 10) || arObstacles[lastObstacle].isResting()) {
 									arObstacles[i].startMoving(speed);
 									lastObstacle = i;
 								}
@@ -180,14 +202,29 @@ void game::run() {
 					}
 				}
 
-				scoreCountdown--;
 				if (scoreCountdown == 0) {
 					score++;
 					scoreCountdown = 10;
 				}
-				playerSpriteCountdown--;
-				if (playerSpriteCountdown == 0) {
-					playerSpriteCountdown = 10;
+				scoreCountdown--;
+
+				if (contam < 2) {
+					if (playerSpriteCountdown == 0) {
+						playerSpriteCountdown = 18;
+					}
+					playerSpriteCountdown--;
+					if (playerSpriteCountdown == 0) {
+						playerSpriteCountdown = 17;
+					}
+				}
+				else {
+					if (playerSpriteCountdown == 0) {
+						playerSpriteCountdown = 10;
+					}
+					playerSpriteCountdown--;
+					if (playerSpriteCountdown == 0) {
+						playerSpriteCountdown = 9;
+					}
 				}
 			}
 			if (state == 2) {
@@ -196,8 +233,15 @@ void game::run() {
 				}
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
 					if (restartCountdown <= 0) {
+						state = 1;
 						run();
 					}
+				}
+			}
+			if (state == 0) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+					state = 1;
+					run();
 				}
 			}
 		}
@@ -205,26 +249,12 @@ void game::run() {
 		window.clear();
 		window.draw(rectSky);
 		window.draw(rectGround);
-		window.draw(spriteMountain1);
-		window.draw(spriteMountain2);
-		window.draw(spriteMountain3);
-		window.draw(spriteMountain4);
-		window.draw(spriteMountain1_contam1);
-		window.draw(spriteMountain2_contam1);
-		window.draw(spriteMountain3_contam1);
-		window.draw(spriteMountain4_contam1);
-		window.draw(spriteMountain1_contam2);
-		window.draw(spriteMountain2_contam2);
-		window.draw(spriteMountain3_contam2);
-		window.draw(spriteMountain4_contam2);
-		window.draw(spriteTallObstacle1);
-		window.draw(spriteTallObstacle2);
-		window.draw(spriteMedObstacle1);
-		window.draw(spriteMedObstacle2);
-		window.draw(spriteWideObstacle1);
-		window.draw(spriteWideObstacle2);
-		renderPlayerChar();
 
+		if (state != 0 && firstCycleRan == true) {
+			renderMountains();
+			renderObstacles();
+			renderPlayerChar();
+		}
 		std::ostringstream strScore;
 		strScore << score;
 		sf::Text txtScore(strScore.str(), font, 15);
@@ -247,46 +277,209 @@ void game::run() {
 			window.draw(txtRestart);
 		}
 
+		if (state == 0) {
+			sf::Text txtStart("Press Spacebar to start.", font, 15);
+			txtStart.setPosition(sf::Vector2f(267, 120));
+			window.draw(txtStart);
+		}
+
 		window.display();
 
 		accumulator += upsClock.restart();
-	}
-}
-
-void game::renderPlayerChar() {
-	if (!marioWalk1.isJumping()) {
-		if (playerSpriteCountdown < 11 && playerSpriteCountdown > 6) {
-			window.draw(spriteMarioWalk1);
-		}
-		else if (playerSpriteCountdown < 7 && playerSpriteCountdown > 3) {
-			window.draw(spriteMarioWalk2);
-		}
-		else if (playerSpriteCountdown < 4 && playerSpriteCountdown > 0) {
-			window.draw(spriteMarioWalk3);
-		}
-	}
-	else {
-		window.draw(spriteMarioJump);
+		firstCycleRan = true;
 	}
 }
 
 void game::checkCollision() {
-	for (int i = 0; i < 6; i++) {
-		if (i != disabledObst) {
-			if (marioWalk1.getPosition().x + marioWalk1.getWidth() > arObstacles[i].getPosition().x && marioWalk1.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
-				if (marioWalk1.getPosition().y + marioWalk1.getHeight() > arObstacles[i].getPosition().y) {
-					contam++;
-					disabledObst = i;
+	switch (contam) {
+	case 0:
+		for (int i = 0; i < 6; i++) {
+			if (i != disabledObst) {
+				if (marioWalk1.getPosition().x + marioWalk1.getWidth() > arObstacles[i].getPosition().x && marioWalk1.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
+					if (marioWalk1.getPosition().y + marioWalk1.getHeight() > arObstacles[i].getPosition().y) {
+						contam++;
+						disabledObst = i;
 
-					if (contam < 3) {
-						for (int j = contam * 4; j < (contam * 4) + 4; j++) {
-							arMountains[j].Rest();
+						if (contam < 3) {
+							for (int j = contam * 4; j < (contam * 4) + 4; j++) {
+								arMountains[j].Rest();
+							}
+							changeChar();
 						}
 					}
 				}
 			}
 		}
+		break;
+	case 1:
+		for (int i = 0; i < 6; i++) {
+			if (i != disabledObst) {
+				if (quoteWalk1.getPosition().x + quoteWalk1.getWidth() > arObstacles[i].getPosition().x && quoteWalk1.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
+					if (quoteWalk1.getPosition().y + quoteWalk1.getHeight() > arObstacles[i].getPosition().y) {
+						contam++;
+						disabledObst = i;
+
+						if (contam < 3) {
+							for (int j = contam * 4; j < (contam * 4) + 4; j++) {
+								arMountains[j].Rest();
+							}
+							changeChar();
+						}
+					}
+				}
+			}
+		}
+		break;
+	case 2:
+		for (int i = 0; i < 6; i++) {
+			if (i != disabledObst) {
+				if (dinoWalk1.getPosition().x + dinoWalk1.getWidth() > arObstacles[i].getPosition().x && dinoWalk1.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
+					if (dinoWalk1.getPosition().y + dinoWalk1.getHeight() > arObstacles[i].getPosition().y) {
+						contam++;
+						disabledObst = i;
+
+						if (contam < 3) {
+							for (int j = contam * 4; j < (contam * 4) + 4; j++) {
+								arMountains[j].Rest();
+							}
+							changeChar();
+						}
+					}
+				}
+			}
+		}
+		break;
 	}
+}
+
+void game::changeChar() {
+	if (contam == 1) {
+		quoteWalk1.setSize(27, 30);
+		quoteWalk2.setSize(27, 29);
+		quoteWalk3.setSize(27, 30);
+		quoteJump1.setSize(27, 30);
+		quoteJump2.setSize(27, 30);
+
+		quoteWalk1.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+		quoteWalk1.setdy(marioWalk1.getdy());
+	}
+	else if (contam == 2) {
+		dinoWalk1.setSize(39, 42);
+		dinoWalk2.setSize(39, 42);
+		dinoJump.setSize(39, 42);
+
+		dinoWalk1.setPosition(quoteWalk1.getPosition().x - 6, quoteWalk1.getPosition().y - 12);
+		dinoWalk1.setdy(quoteWalk1.getdy());
+
+		playerSpriteCountdown = 10;
+	}
+}
+
+void game::renderPlayerChar() {
+	switch (contam) {
+	case 0:
+		if (!marioWalk1.isJumping()) {
+			if (playerSpriteCountdown < 18 && playerSpriteCountdown >= 14) {
+				window.draw(spriteMarioWalk1);
+			}
+			else if (playerSpriteCountdown < 14 && playerSpriteCountdown >= 10) {
+				window.draw(spriteMarioWalk2);
+			}
+			else if (playerSpriteCountdown < 10 && playerSpriteCountdown >= 6) {
+				window.draw(spriteMarioWalk3);
+			}
+			else if (playerSpriteCountdown < 6 && playerSpriteCountdown > 0) {
+				window.draw(spriteMarioWalk2);
+			}
+		}
+		else {
+			window.draw(spriteMarioJump);
+		}
+		break;
+	case 1:
+		if (!quoteWalk1.isJumping()) {
+			if (playerSpriteCountdown < 18 && playerSpriteCountdown >= 14) {
+				window.draw(spriteQuoteWalk1);
+			}
+			else if (playerSpriteCountdown < 14 && playerSpriteCountdown >= 10) {
+				window.draw(spriteQuoteWalk2);
+			}
+			else if (playerSpriteCountdown < 10 && playerSpriteCountdown >= 6) {
+				window.draw(spriteQuoteWalk3);
+			}
+			else if (playerSpriteCountdown < 6 && playerSpriteCountdown > 0) {
+				window.draw(spriteQuoteWalk2);
+			}
+		}
+		else {
+			if (quoteWalk1.getdy() < 0) {
+				window.draw(spriteQuoteWalk3);
+			}
+			else {
+				window.draw(spriteQuoteWalk1);
+			}
+		}
+		break;
+	case 2:
+		if (!dinoWalk1.isJumping()) {
+			if (playerSpriteCountdown < 10 && playerSpriteCountdown >= 6) {
+				window.draw(spriteDinoWalk1);
+			}
+			else if (playerSpriteCountdown < 6 && playerSpriteCountdown > 0) {
+				window.draw(spriteDinoWalk2);
+			}
+		}
+		else {
+			window.draw(spriteDinoJump);
+		}
+		break;
+	}
+}
+
+void game::setSpritePosition() {
+	spriteTallObstacle1.setPosition(arObstacles[0].getPosition());
+	spriteTallObstacle2.setPosition(arObstacles[1].getPosition());
+	spriteMedObstacle1.setPosition(arObstacles[2].getPosition());
+	spriteMedObstacle2.setPosition(arObstacles[3].getPosition());
+	spriteWideObstacle1.setPosition(arObstacles[4].getPosition());
+	spriteWideObstacle2.setPosition(arObstacles[5].getPosition());
+
+	spriteMountain1.setPosition(arMountains[0].getPosition());
+	spriteMountain2.setPosition(arMountains[1].getPosition());
+	spriteMountain3.setPosition(arMountains[2].getPosition());
+	spriteMountain4.setPosition(arMountains[3].getPosition());
+	spriteMountain1_contam1.setPosition(arMountains[4].getPosition());
+	spriteMountain2_contam1.setPosition(arMountains[5].getPosition());
+	spriteMountain3_contam1.setPosition(arMountains[6].getPosition());
+	spriteMountain4_contam1.setPosition(arMountains[7].getPosition());
+	spriteMountain1_contam2.setPosition(arMountains[8].getPosition());
+	spriteMountain2_contam2.setPosition(arMountains[9].getPosition());
+	spriteMountain3_contam2.setPosition(arMountains[10].getPosition());
+	spriteMountain4_contam2.setPosition(arMountains[11].getPosition());
+}
+
+void game::renderMountains() {
+	window.draw(spriteMountain1);
+	window.draw(spriteMountain2);
+	window.draw(spriteMountain3);
+	window.draw(spriteMountain4);
+	window.draw(spriteMountain1_contam1);
+	window.draw(spriteMountain2_contam1);
+	window.draw(spriteMountain3_contam1);
+	window.draw(spriteMountain4_contam1);
+	window.draw(spriteMountain1_contam2);
+	window.draw(spriteMountain2_contam2);
+	window.draw(spriteMountain3_contam2);
+	window.draw(spriteMountain4_contam2);
+}
+
+void game::renderObstacles() {
+	window.draw(spriteTallObstacle1);
+	window.draw(spriteTallObstacle2);
+	window.draw(spriteMedObstacle1);
+	window.draw(spriteMedObstacle2);
+	window.draw(spriteWideObstacle1);
+	window.draw(spriteWideObstacle2);
 }
 
 void game::over() {
