@@ -120,8 +120,8 @@ void game::run() {
 					marioWalk1.Jump();
 				}
 				marioWalk1.Move();
-				marioWalk2.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
-				marioWalk3.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+				marioWalk2.setPosition(marioWalk1.getPosition().x+4, marioWalk1.getPosition().y-3);
+				marioWalk3.setPosition(marioWalk1.getPosition().x-3, marioWalk1.getPosition().y-3);
 				marioJump.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
 				checkCollision();
 				if (contam >= 3) {
@@ -155,7 +155,7 @@ void game::run() {
 
 
 				for (int i = 0; i < 6; i++) {
-					arObstacles[i].Move();
+					//arObstacles[i].Move();
 					arObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
 					if (arObstacles[i].getRestClock().getElapsedTime() > arObstacles[i].getRestTime()) {
 						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || arObstacles[lastObstacle].isResting()) {
