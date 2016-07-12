@@ -7,8 +7,13 @@ game::game() :
 	rectSky(sf::Vector2f(WindowWidth, GL)),
 	rectGround(sf::Vector2f(WindowWidth, WindowHeight - GL)),
 	font(),
-	spritePlayerChar(textureMario, sf::IntRect(211, 0, 12, 15)),
-	playerChar(),
+	spriteMarioWalk1(textureMario, sf::IntRect(2, 2, 29, 30)),
+	spriteMarioWalk2(textureMario, sf::IntRect(39, 5, 25, 33)),
+	spriteMarioWalk3(textureMario, sf::IntRect(71, 5, 33, 33)),
+	spriteMarioJump(textureMario, sf::IntRect(114, 5, 36, 33)),
+	marioWalk1(),
+	marioWalk2(),
+	marioJump(),
 	spriteTallObstacle1(textureObstacles, sf::IntRect(5, 4, 53, 125)),
 	spriteTallObstacle2(textureObstacles, sf::IntRect(5, 4, 53, 125)),
 	spriteMedObstacle1(textureObstacles, sf::IntRect(83, 40, 47, 89)),
@@ -28,7 +33,7 @@ game::game() :
 
 	spriteMountain1_contam2(textureMountains, sf::IntRect(0, 647, 202, 83)),
 	spriteMountain2_contam2(textureMountains, sf::IntRect(222, 666, 308, 64)),
-	spriteMountain3_contam2(textureMountains, sf::IntRect(10, 814, 155, 59)),
+	spriteMountain3_contam2(textureMountains, sf::IntRect(10, 814, 155, 55)),
 	spriteMountain4_contam2(textureMountains, sf::IntRect(205, 823, 220, 46)),
 
 	txtScore(),
@@ -39,6 +44,7 @@ game::game() :
 	score(0),
 	speed(5),
 	scoreCountdown(10),
+	playerSpriteCountdown(10),
 	upsClock(),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f)),
@@ -50,16 +56,16 @@ game::game() :
 	rectGround.setPosition(sf::Vector2f(0, GL));
 	rectGround.setFillColor(sf::Color(134, 89, 45));
 
-	if (!font.loadFromFile("ACaslonPro-Regular.otf")) {
+	if (!font.loadFromFile("pixelmix_bold.ttf")) {
 		// error
 	}
-	if (!textureMario.loadFromFile("mario.png")) {
+	if (!textureMario.loadFromFile("sprites/player.png")) {
 		// error
 	}
-	if (!textureObstacles.loadFromFile("obstacles.png")) {
+	if (!textureObstacles.loadFromFile("sprites/obstacles.png")) {
 		// error
 	}
-	if (!textureMountains.loadFromFile("mountains.png")) {
+	if (!textureMountains.loadFromFile("sprites/mountains.png")) {
 		// error
 	}
 }
@@ -88,7 +94,7 @@ void game::run() {
 	arMountains[7].setSize(220, 35);
 	arMountains[8].setSize(202, 83);
 	arMountains[9].setSize(308, 64);
-	arMountains[10].setSize(155, 59);
+	arMountains[10].setSize(155, 55);
 	arMountains[11].setSize(220, 46);
 	for (int i = 0; i < 4; i++) {
 		arMountains[i].Rest();
@@ -111,15 +117,22 @@ void game::run() {
 				speed = 5 + log(score + 10);
 
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-					playerChar.Jump();
+					marioWalk1.Jump();
 				}
-				playerChar.Move();
+				marioWalk1.Move();
+				marioWalk2.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+				marioWalk3.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
+				marioJump.setPosition(marioWalk1.getPosition().x, marioWalk1.getPosition().y);
 				checkCollision();
 				if (contam >= 3) {
 					over();
 				}
 
-				spritePlayerChar.setPosition(playerChar.getPosition());
+				spriteMarioWalk1.setPosition(marioWalk1.getPosition());
+				spriteMarioWalk2.setPosition(marioWalk2.getPosition());
+				spriteMarioWalk3.setPosition(marioWalk3.getPosition());
+				spriteMarioJump.setPosition(marioJump.getPosition());
+
 				spriteTallObstacle1.setPosition(arObstacles[0].getPosition());
 				spriteTallObstacle2.setPosition(arObstacles[1].getPosition());
 				spriteMedObstacle1.setPosition(arObstacles[2].getPosition());
@@ -175,6 +188,10 @@ void game::run() {
 					score++;
 					scoreCountdown = 10;
 				}
+				playerSpriteCountdown--;
+				if (playerSpriteCountdown == 0) {
+					playerSpriteCountdown = 10;
+				}
 			}
 		}
 
@@ -199,12 +216,12 @@ void game::run() {
 		window.draw(spriteMedObstacle2);
 		window.draw(spriteWideObstacle1);
 		window.draw(spriteWideObstacle2);
-		window.draw(spritePlayerChar);
+		renderPlayerChar();
 
 		std::ostringstream strScore;
 		//strCursorPos << "(" << contam << ", " << score << ")";
 		strScore << score;
-		sf::Text txtScore(strScore.str(), font, 22);
+		sf::Text txtScore(strScore.str(), font, 15);
 		txtScore.setColor(sf::Color::White);
 		txtScore.setPosition(sf::Vector2f(WindowWidth - 60, 5));
 		window.draw(txtScore);
@@ -215,12 +232,28 @@ void game::run() {
 	}
 }
 
+void game::renderPlayerChar() {
+	if (!marioWalk1.isJumping()) {
+		if (playerSpriteCountdown < 11 && playerSpriteCountdown > 6) {
+			window.draw(spriteMarioWalk1);
+		}
+		else if (playerSpriteCountdown < 7 && playerSpriteCountdown > 3) {
+			window.draw(spriteMarioWalk2);
+		}
+		else if (playerSpriteCountdown < 4 && playerSpriteCountdown > 0) {
+			window.draw(spriteMarioWalk3);
+		}
+	}
+	else {
+		window.draw(spriteMarioJump);
+	}
+}
+
 void game::checkCollision() {
 	for (int i = 0; i < 6; i++) {
 		if (i != disabledObst) {
-			if (playerChar.getPosition().x + playerChar.getWidth() > arObstacles[i].getPosition().x && playerChar.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
-				if (playerChar.getPosition().y + playerChar.getHeight() > arObstacles[i].getPosition().y) {
-					playerChar.MoveIn();
+			if (marioWalk1.getPosition().x + marioWalk1.getWidth() > arObstacles[i].getPosition().x && marioWalk1.getPosition().x < arObstacles[i].getPosition().x + arObstacles[i].getWidth()) {
+				if (marioWalk1.getPosition().y + marioWalk1.getHeight() > arObstacles[i].getPosition().y) {
 					contam++;
 					disabledObst = i;
 

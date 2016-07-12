@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <Windows.h>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -18,6 +19,7 @@ public:
 	int getSpeed();
 	int getState();
 	void checkCollision();
+	void renderPlayerChar();
 	~game();
 private:
 	sf::RenderWindow window;
@@ -29,7 +31,10 @@ private:
 	sf::Texture textureObstacles;
 	sf::Texture textureMountains;
 
-	sf::Sprite spritePlayerChar;
+	sf::Sprite spriteMarioWalk1;
+	sf::Sprite spriteMarioWalk2;
+	sf::Sprite spriteMarioWalk3;
+	sf::Sprite spriteMarioJump;
 
 	sf::Sprite spriteTallObstacle1;
 	sf::Sprite spriteTallObstacle2;
@@ -53,7 +58,10 @@ private:
 
 	sf::Text txtScore;
 	std::ostringstream strScore;
-	character playerChar;
+	character marioWalk1;
+	character marioWalk2;
+	character marioWalk3;
+	character marioJump;
 	obstacle* arObstacles = new obstacle[6];
 	mountain* arMountains = new mountain[12];
 
@@ -64,6 +72,7 @@ private:
 	int lastObstacle;
 	int score;
 	int scoreCountdown;
+	int playerSpriteCountdown;
 	float speed;
 	float contam;
 	int disabledObst;

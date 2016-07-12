@@ -10,10 +10,11 @@ public:
 	void Move();
 	void Jump();
 	void Land();
-	void MoveIn();
 	sf::Vector2f getPosition();
+	void setPosition(int newx, int newy);
 	float getdx();
 	float getdy();
+	void setSize(int newWidth, int newHeight);
 	float getWidth();
 	float getHeight();
 	int getSelectedSprite();

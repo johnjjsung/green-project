@@ -4,8 +4,8 @@ character::character() :
 	position(sf::Vector2f(80, GL - height)),
 	dx(0),
 	dy(0),
-	width(12),
-	height(15),
+	width(29),
+	height(30),
 	jumping(0),
 	jumpPower(10)
 {
@@ -44,12 +44,12 @@ void character::Land() {
 	jumpPower = 10;
 }
 
-void character::MoveIn() {
-	
-}
-
 sf::Vector2f character::getPosition() {
 	return position;
+}
+
+void character::setPosition(int newx, int newy) {
+	position = sf::Vector2f(newx, newy);
 }
 
 float character::getdx() {
@@ -58,6 +58,12 @@ float character::getdx() {
 
 float character::getdy() {
 	return dy;
+}
+
+void character::setSize(int newWidth, int newHeight) {
+	width = newWidth;
+	height = newHeight;
+	position = sf::Vector2f(80, GL - height);
 }
 
 float character::getWidth() {
