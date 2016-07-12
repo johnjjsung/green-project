@@ -7,10 +7,10 @@ game::game() :
 	rectSky(sf::Vector2f(WindowWidth, GL)),
 	rectGround(sf::Vector2f(WindowWidth, WindowHeight - GL)),
 	font(),
-	spriteMarioWalk1(textureMario, sf::IntRect(2, 2, 29, 30)),
-	spriteMarioWalk2(textureMario, sf::IntRect(39, 5, 25, 33)),
-	spriteMarioWalk3(textureMario, sf::IntRect(71, 5, 33, 33)),
-	spriteMarioJump(textureMario, sf::IntRect(114, 5, 36, 33)),
+	spriteMarioWalk1(textuerPlayerChar, sf::IntRect(2, 2, 29, 30)),
+	spriteMarioWalk2(textuerPlayerChar, sf::IntRect(39, 5, 25, 33)),
+	spriteMarioWalk3(textuerPlayerChar, sf::IntRect(71, 5, 33, 33)),
+	spriteMarioJump(textuerPlayerChar, sf::IntRect(114, 5, 36, 33)),
 	marioWalk1(),
 	marioWalk2(),
 	marioJump(),
@@ -59,7 +59,7 @@ game::game() :
 	if (!font.loadFromFile("pixelmix_bold.ttf")) {
 		// error
 	}
-	if (!textureMario.loadFromFile("sprites/player.png")) {
+	if (!textuerPlayerChar.loadFromFile("sprites/player.png")) {
 		// error
 	}
 	if (!textureObstacles.loadFromFile("sprites/obstacles.png")) {
@@ -155,7 +155,7 @@ void game::run() {
 
 
 				for (int i = 0; i < 6; i++) {
-					//arObstacles[i].Move();
+					arObstacles[i].Move();
 					arObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
 					if (arObstacles[i].getRestClock().getElapsedTime() > arObstacles[i].getRestTime()) {
 						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || arObstacles[lastObstacle].isResting()) {

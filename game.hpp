@@ -27,7 +27,7 @@ private:
 	sf::RectangleShape rectGround;
 	sf::Font font;
 	sf::ContextSettings settings;
-	sf::Texture textureMario;
+	sf::Texture textuerPlayerChar;
 	sf::Texture textureObstacles;
 	sf::Texture textureMountains;
 
