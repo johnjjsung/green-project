@@ -14,10 +14,6 @@ public:
 	game();
 	void run();
 	void over();
-	int getScore();
-	int getContam();
-	int getSpeed();
-	int getState();
 	void checkCollision();
 	void renderPlayerChar();
 	~game();
@@ -56,8 +52,6 @@ private:
 	sf::Sprite spriteMountain3_contam2;
 	sf::Sprite spriteMountain4_contam2;
 
-	sf::Text txtScore;
-	std::ostringstream strScore;
 	character marioWalk1;
 	character marioWalk2;
 	character marioWalk3;
@@ -72,11 +66,13 @@ private:
 	int lastObstacle;
 	int score;
 	int scoreCountdown;
+	int highScore;
 	int playerSpriteCountdown;
 	float speed;
 	float contam;
 	int disabledObst;
 	int state;	//Ready, Running, Over
 	int countMountainTexture;
+	int restartCountdown;
 };
 

@@ -11,9 +11,7 @@ game::game() :
 	spriteMarioWalk2(textuerPlayerChar, sf::IntRect(39, 5, 25, 33)),
 	spriteMarioWalk3(textuerPlayerChar, sf::IntRect(71, 5, 33, 33)),
 	spriteMarioJump(textuerPlayerChar, sf::IntRect(114, 5, 36, 33)),
-	marioWalk1(),
-	marioWalk2(),
-	marioJump(),
+
 	spriteTallObstacle1(textureObstacles, sf::IntRect(5, 4, 53, 125)),
 	spriteTallObstacle2(textureObstacles, sf::IntRect(5, 4, 53, 125)),
 	spriteMedObstacle1(textureObstacles, sf::IntRect(83, 40, 47, 89)),
@@ -36,19 +34,12 @@ game::game() :
 	spriteMountain3_contam2(textureMountains, sf::IntRect(10, 814, 155, 55)),
 	spriteMountain4_contam2(textureMountains, sf::IntRect(205, 823, 220, 46)),
 
-	txtScore(),
-	strScore(),
-	lastObstacle(),
-	contam(0),
-	disabledObst(42),
-	score(0),
-	speed(5),
-	scoreCountdown(10),
 	playerSpriteCountdown(10),
 	upsClock(),
 	accumulator(sf::Time::Zero),
 	ups(sf::seconds(1.f / 60.f)),
-	state(0)
+	state(0),
+	highScore(0)
 {
 	settings.antialiasingLevel = 4;
 	window.setVerticalSyncEnabled(true);
@@ -71,9 +62,17 @@ game::game() :
 }
 
 void game::run() {
-
 	srand(time(NULL));
+
+	speed = 5;
+	score = 0;
+	contam = 0;
+	scoreCountdown = 10;
+	restartCountdown = 100;
+	disabledObst = 42;
 	lastObstacle = 0;
+	state = 1;	//Running
+
 	arObstacles[0].setSize(53, 125);
 	arObstacles[1].setSize(53, 125);
 	arObstacles[2].setSize(47, 89);
@@ -96,11 +95,9 @@ void game::run() {
 	arMountains[9].setSize(308, 64);
 	arMountains[10].setSize(155, 55);
 	arMountains[11].setSize(220, 46);
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 12; i++) {
 		arMountains[i].Rest();
 	}
-
-	state = 1;	//Running
 
 	while (window.isOpen()) {
 		sf::Event event;
@@ -114,7 +111,7 @@ void game::run() {
 			accumulator -= ups;
 
 			if (state == 1) {
-				speed = 5 + log(score + 10);
+				speed = 6 + score/120;
 
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
 					marioWalk1.Jump();
@@ -158,9 +155,9 @@ void game::run() {
 					arObstacles[i].Move();
 					arObstacles[i].setRestTimeBase(8000 - (speed * 1.5));
 					if (arObstacles[i].getRestClock().getElapsedTime() > arObstacles[i].getRestTime()) {
-						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 5) || arObstacles[lastObstacle].isResting()) {
+						if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 6) || arObstacles[lastObstacle].isResting()) {
 							if ((lastObstacle == 1 || 2) && (i == 1 || 2)) {
-								if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 7) || arObstacles[lastObstacle].isResting()) {
+								if (arObstacles[lastObstacle].getPosition().x < 500 - (speed * 9) || arObstacles[lastObstacle].isResting()) {
 									arObstacles[i].startMoving(speed);
 									lastObstacle = i;
 								}
@@ -193,6 +190,16 @@ void game::run() {
 					playerSpriteCountdown = 10;
 				}
 			}
+			if (state == 2) {
+				if (restartCountdown > 0) {
+					restartCountdown--;
+				}
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+					if (restartCountdown <= 0) {
+						run();
+					}
+				}
+			}
 		}
 
 		window.clear();
@@ -219,12 +226,26 @@ void game::run() {
 		renderPlayerChar();
 
 		std::ostringstream strScore;
-		//strCursorPos << "(" << contam << ", " << score << ")";
 		strScore << score;
 		sf::Text txtScore(strScore.str(), font, 15);
-		txtScore.setColor(sf::Color::White);
 		txtScore.setPosition(sf::Vector2f(WindowWidth - 60, 5));
+
+		std::ostringstream strHighScore;
+		strHighScore << "High " << highScore;
+		sf::Text txtHighScore(strHighScore.str(), font, 15);
+		txtHighScore.setPosition(sf::Vector2f(WindowWidth - 200, 5));
+
 		window.draw(txtScore);
+		window.draw(txtHighScore);
+
+		if (state == 2) {
+			sf::Text txtGameOver("Game Over.", font, 15);
+			sf::Text txtRestart("Press Spacebar to restart.", font, 15);
+			txtGameOver.setPosition(sf::Vector2f(340, 100));
+			txtRestart.setPosition(sf::Vector2f(260, 120));
+			window.draw(txtGameOver);
+			window.draw(txtRestart);
+		}
 
 		window.display();
 
@@ -269,23 +290,10 @@ void game::checkCollision() {
 }
 
 void game::over() {
-	state = 0;
-}
-
-int game::getScore() {
-	return score;
-}
-
-int game::getContam() {
-	return contam;
-}
-
-int game::getSpeed() {
-	return speed;
-}
-
-int game::getState() {
-	return state;
+	if (score > highScore) {
+		highScore = score;
+	}
+	state = 2;
 }
 
 game::~game()
